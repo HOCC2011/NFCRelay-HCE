@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<host-apdu-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:requireDeviceUnlock="false"
+    android:requireDeviceScreenOn="false"
+    android:description="@string/service_name">
+    <aid-group android:category="payment" android:description="@string/service_name">
+        <!-- Tango AIDs -->
+        <aid-filter android:name="F000864200"/>
+        <aid-filter android:name="F000864257"/>
+        <!-- Android Octopus AID -->
+        <aid-filter android:name="A0000005500011"/>
+        <!-- T-Union AIDs -->
+        <aid-filter android:name="A000000632010105"/> <!-- MOT_T_EP AID-->
+        <aid-filter android:name="A000000632010106"/> <!-- MOT_T_CASH AID-->
+        <!-- Macau Pass AIDs -->
+        <aid-filter android:name="414D544A4156414341524411"/>
+        <aid-filter android:name="B0C4C3C5CDA8C7AEB0FC"/>
+        <!-- EMV cards AIDs -->
+        <aid-filter android:name="315041592E5359532E4444463031"/> <!-- PSE AID-->
+        <aid-filter android:name="325041592E5359532E4444463031"/> <!-- PPSE AID-->
+        <aid-filter android:name="A0000000031010"/> <!-- Visa AID-->
+        <aid-filter android:name="A0000000041010"/> <!-- Mastercard AID-->
+        <aid-filter android:name="A0000003330101"/> <!-- UnionPay AID-->
+    </aid-group>
+</host-apdu-service>
