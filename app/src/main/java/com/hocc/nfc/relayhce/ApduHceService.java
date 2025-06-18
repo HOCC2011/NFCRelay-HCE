@@ -14,7 +14,7 @@ import java.util.concurrent.*;
 
 public class ApduHceService extends HostApduService {
 
-    private  String SERVER_IP = null; // Replace with your server IP
+    private String SERVER_IP = null;
     private static final int SERVER_PORT = 8888;
     private static final int TIMEOUT_MS = 500;
 
@@ -22,26 +22,40 @@ public class ApduHceService extends HostApduService {
     public byte[] processCommandApdu(byte[] commandApdu, Bundle extras) {
         SERVER_IP = this.getSharedPreferences("NetworkPref", Context.MODE_PRIVATE).getString("IpAddress", "192.168.50.22");
         String hexCommand = bytesToHex(commandApdu);
-        Log.d("Tag", "Received APDU:" + hexCommand);
-        Log.d("Client", "Connecting to server IP: " + SERVER_IP);
+        Log.d("Tag", "Received APDU: " + hexCommand);
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<String> future = executor.submit(() -> sendApduToServer(hexCommand));
+        String responseHex = null;
+
         try {
-            String responseHex = future.get(TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            responseHex = future.get(TIMEOUT_MS, TimeUnit.MILLISECONDS);
             Log.d("Client", "Final Response: " + responseHex);
-            return hexStringToByteArray(responseHex);
         } catch (Exception e) {
             Log.e("Client", "Timeout or error: " + e);
-            return hexStringToByteArray("6F00"); // fallback response
+            responseHex = "6F00";
         } finally {
             executor.shutdown();
+        }
+
+        if (responseHex == null || responseHex.length() < 4) {
+            Log.e("Client", "Empty or invalid response, sending 6F00");
+            responseHex = "6F00";
+        }
+
+        try {
+            byte[] responseBytes = hexStringToByteArray(responseHex);
+            Log.d("ApduService", "Sending response to NFC reader: " + responseHex);
+            return responseBytes;
+        } catch (Exception e) {
+            Log.e("ApduService", "Failed to convert response to byte[]", e);
+            return hexStringToByteArray("6F00");
         }
     }
 
     private String sendApduToServer(String messageToSend) {
         try (Socket socket = new Socket(SERVER_IP, SERVER_PORT)) {
-            Log.d("Client", "Connecting to server IP: " + SERVER_IP);
+            Log.d("Client", "Connected to server at: " + SERVER_IP);
             Log.d("Client", "Local IP: " + socket.getLocalAddress().getHostAddress());
 
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
