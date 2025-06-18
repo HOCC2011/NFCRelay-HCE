@@ -1,5 +1,6 @@
 package com.hocc.nfc.relayhce;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -24,6 +25,9 @@ public class MainActivity extends AppCompatActivity {
                     .apply();
             Toast.makeText(this, "Successfully saved the new ip address to the app.", Toast.LENGTH_LONG).show();
         });
+        stopService(new Intent(this, ForegroundService.class));
+        Intent serviceIntent = new Intent(this, ForegroundService.class);
+        startForegroundService(serviceIntent);
     }
 }
 
