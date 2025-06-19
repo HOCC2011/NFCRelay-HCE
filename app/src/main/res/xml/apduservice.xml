@@ -13,7 +13,7 @@
         <aid-filter android:name="A000000632010105"/> <!-- MOT_T_EP AID-->
         <aid-filter android:name="A000000632010106"/> <!-- MOT_T_CASH AID-->
         <!-- Macau Pass AIDs -->
-        <aid-filter android:name="414D544A4156414341524411"/>
+        <aid-filter android:name="414D544A41564143415244"/>
         <aid-filter android:name="B0C4C3C5CDA8C7AEB0FC"/>
         <!-- EMV cards AIDs -->
         <aid-filter android:name="315041592E5359532E4444463031"/> <!-- PSE AID-->
