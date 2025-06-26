@@ -1,6 +1,7 @@
 package com.hocc.nfc.relayhce;
 
 import android.content.Context;
+import android.content.Intent;
 import android.nfc.cardemulation.HostApduService;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +24,9 @@ public class ApduHceService extends HostApduService {
         SERVER_IP = this.getSharedPreferences("NetworkPref", Context.MODE_PRIVATE).getString("IpAddress", "192.168.50.22");
         String hexCommand = bytesToHex(commandApdu);
         Log.d("Tag", "Received APDU: " + hexCommand);
+        this.getSharedPreferences("Logs", MODE_PRIVATE).edit().putString("receivedBytes", bytesToHexWithSpace(commandApdu)).apply();
+        Intent StartIntent = new Intent("com.hocc.nfc.relayhce.logApdu").setPackage(getPackageName());
+        sendBroadcast(StartIntent);
 
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Future<String> future = executor.submit(() -> sendApduToServer(hexCommand));
@@ -46,9 +50,15 @@ public class ApduHceService extends HostApduService {
         try {
             byte[] responseBytes = hexStringToByteArray(responseHex);
             Log.d("ApduService", "Sending response to NFC reader: " + responseHex);
+            this.getSharedPreferences("Logs", MODE_PRIVATE).edit().putString("returnBytes", bytesToHexWithSpace(responseBytes)).apply();
+            Intent StartIntent1 = new Intent("com.hocc.nfc.relayhce.logResponse").setPackage(getPackageName());
+            sendBroadcast(StartIntent1);
             return responseBytes;
         } catch (Exception e) {
             Log.e("ApduService", "Failed to convert response to byte[]", e);
+            this.getSharedPreferences("Logs", MODE_PRIVATE).edit().putString("returnBytes", bytesToHexWithSpace(hexStringToByteArray("6F00"))).apply();
+            Intent StartIntent1 = new Intent("com.hocc.nfc.relayhce.logResponse").setPackage(getPackageName());
+            sendBroadcast(StartIntent1);
             return hexStringToByteArray("6F00");
         }
     }
@@ -81,6 +91,14 @@ public class ApduHceService extends HostApduService {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
             sb.append(String.format("%02X", b));
+        }
+        return sb.toString();
+    }
+
+    private static String bytesToHexWithSpace(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02X ", b));
         }
         return sb.toString();
     }
